@@ -3,21 +3,24 @@
 import { CldUploadWidget } from 'next-cloudinary';
 import { useState, useEffect } from 'react';
 import Image from 'next/image';
-import { saveImageToFirestore, getImagesFromFirestore, deleteImageFromFirestore, deleteMultipleImagesFromFirestore, ImageData } from '@/lib/firestoreService';
+import { saveImageToFirestore, getImagesFromFirestore, deleteImageFromFirestore, deleteMultipleImagesFromFirestore, ImageData, getContactsFromFirestore, ContactData } from '@/lib/firestoreService';
 import { motion, AnimatePresence } from 'framer-motion';
-import { FaTrash, FaCloudUploadAlt, FaCheck, FaTimes } from 'react-icons/fa';
+import { FaTrash, FaCloudUploadAlt, FaCheck, FaTimes, FaUsers, FaImages } from 'react-icons/fa';
 import { auth } from '@/lib/firebase';
 import { onAuthStateChanged } from 'firebase/auth';
 import { useRouter } from 'next/navigation';
 
 export default function ImageUploadAdmin() {
   const [images, setImages] = useState<ImageData[]>([]);
+  const [contacts, setContacts] = useState<ContactData[]>([]);
   const [uploading, setUploading] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [contactsLoading, setContactsLoading] = useState(false);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [checking, setChecking] = useState(true);
   const [selectedImages, setSelectedImages] = useState<string[]>([]);
   const [isSelectionMode, setIsSelectionMode] = useState(false);
+  const [activeTab, setActiveTab] = useState<'images' | 'contacts'>('images');
   const router = useRouter();
 
   // Check authentication status
@@ -42,10 +45,19 @@ export default function ImageUploadAdmin() {
     setLoading(false);
   };
 
-  // Load images when component mounts
+  // Load contacts on component mount
+  const loadContacts = async () => {
+    setContactsLoading(true);
+    const fetchedContacts = await getContactsFromFirestore();
+    setContacts(fetchedContacts);
+    setContactsLoading(false);
+  };
+
+  // Load data when component mounts
   useEffect(() => {
     if (isAuthenticated) {
       loadImages();
+      loadContacts();
     }
   }, [isAuthenticated]);
 
@@ -149,7 +161,7 @@ export default function ImageUploadAdmin() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 p-4 sm:p-8">
+    <div className="min-h-screen p-4 sm:p-8" style={{ backgroundColor: '#376C6F' }}>
       <div className="max-w-full mx-auto">
         {/* Header */}
         <motion.div
@@ -159,7 +171,7 @@ export default function ImageUploadAdmin() {
         >
           <div className="flex justify-between items-center mb-4">
             <div className="flex-1"></div>
-            <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-gray-800 flex-1">
+            <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-white flex-1">
               Admin Paneli
             </h1>
             <div className="flex-1 flex justify-end">
@@ -167,7 +179,7 @@ export default function ImageUploadAdmin() {
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
                 onClick={handleLogout}
-                className="px-6 py-2 bg-red-500 text-white font-medium rounded-lg hover:bg-red-600 transition-colors"
+                className="px-6 py-2 bg-red-600 text-white font-medium rounded-lg hover:bg-red-700 transition-colors"
               >
                 Çıkış
               </motion.button>
@@ -175,15 +187,67 @@ export default function ImageUploadAdmin() {
           </div>
         </motion.div>
 
-        {/* Main Content - Two Column Layout */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        {/* Tab Navigation */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="flex justify-center mb-8"
+        >
+          <div className="bg-white rounded-xl p-2 shadow-lg">
+            <div className="flex gap-2">
+              <motion.button
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                onClick={() => setActiveTab('images')}
+                className={`flex items-center gap-2 px-6 py-3 rounded-lg font-medium transition-colors ${
+                  activeTab === 'images'
+                    ? 'text-white shadow-lg'
+                    : 'text-gray-600 hover:text-gray-800'
+                }`}
+                style={{
+                  backgroundColor: activeTab === 'images' ? '#376C6F' : 'transparent'
+                }}
+              >
+                <FaImages />
+                Görsel Yönetimi
+              </motion.button>
+              <motion.button
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                onClick={() => setActiveTab('contacts')}
+                className={`flex items-center gap-2 px-6 py-3 rounded-lg font-medium transition-colors ${
+                  activeTab === 'contacts'
+                    ? 'text-white shadow-lg'
+                    : 'text-gray-600 hover:text-gray-800'
+                }`}
+                style={{
+                  backgroundColor: activeTab === 'contacts' ? '#376C6F' : 'transparent'
+                }}
+              >
+                <FaUsers />
+                İletişim Mesajları
+              </motion.button>
+            </div>
+          </div>
+        </motion.div>
+
+        {/* Main Content */}
+        <AnimatePresence mode="wait">
+          {activeTab === 'images' ? (
+            <motion.div
+              key="images"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+              className="grid grid-cols-1 lg:grid-cols-2 gap-8"
+            >
           {/* Left Column - Upload Section */}
           <motion.div
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
             className="bg-white rounded-2xl shadow-xl p-6 sm:p-8"
           >
-            <h2 className="text-2xl font-bold text-gray-800 mb-6">Görsel Yükleme</h2>
+            <h2 className="text-2xl font-bold mb-6" style={{ color: '#376C6F' }}>Görsel Yükleme</h2>
             <div className="flex flex-col items-center justify-center h-full">
               <CldUploadWidget
                 uploadPreset={process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET || 'ml_default'}
@@ -195,7 +259,8 @@ export default function ImageUploadAdmin() {
                     whileTap={{ scale: 0.95 }}
                     onClick={() => open()}
                     disabled={uploading}
-                    className="flex items-center gap-3 px-8 py-4 bg-gradient-to-r from-blue-500 to-purple-600 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transition-shadow disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="flex items-center gap-3 px-8 py-4 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transition-shadow disabled:opacity-50 disabled:cursor-not-allowed"
+                    style={{ backgroundColor: '#376C6F' }}
                   >
                     <FaCloudUploadAlt className="text-2xl" />
                     <span>{uploading ? 'Yükleniyor...' : 'Görsel Yükle'}</span>
@@ -208,7 +273,8 @@ export default function ImageUploadAdmin() {
                 whileTap={{ scale: 0.95 }}
                 onClick={loadImages}
                 disabled={loading}
-                className="mt-4 px-6 py-2 bg-gray-200 text-gray-700 font-medium rounded-lg hover:bg-gray-300 transition-colors disabled:opacity-50"
+                className="mt-4 px-6 py-2 text-white font-medium rounded-lg transition-colors disabled:opacity-50"
+                style={{ backgroundColor: '#2A5257' }}
               >
                 {loading ? 'Yükleniyor...' : 'Görselleri Yenile'}
               </motion.button>
@@ -222,14 +288,15 @@ export default function ImageUploadAdmin() {
             className="bg-white rounded-2xl shadow-xl p-6 sm:p-8"
           >
             <div className="flex justify-between items-center mb-6">
-              <h2 className="text-2xl font-bold text-gray-800">Mevcut Görseller</h2>
+              <h2 className="text-2xl font-bold" style={{ color: '#376C6F' }}>Mevcut Görseller</h2>
               <div className="flex gap-2">
                 {!isSelectionMode ? (
                   <motion.button
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
                     onClick={toggleSelectionMode}
-                    className="px-4 py-2 bg-blue-500 text-white font-medium rounded-lg hover:bg-blue-600 transition-colors"
+                    className="px-4 py-2 text-white font-medium rounded-lg transition-colors"
+                    style={{ backgroundColor: '#376C6F' }}
                   >
                     Seç
                   </motion.button>
@@ -239,7 +306,7 @@ export default function ImageUploadAdmin() {
                       whileHover={{ scale: 1.05 }}
                       whileTap={{ scale: 0.95 }}
                       onClick={selectAllImages}
-                      className="px-3 py-2 bg-green-500 text-white font-medium rounded-lg hover:bg-green-600 transition-colors"
+                      className="px-3 py-2 bg-green-600 text-white font-medium rounded-lg hover:bg-green-700 transition-colors"
                     >
                       Tümünü Seç
                     </motion.button>
@@ -247,7 +314,7 @@ export default function ImageUploadAdmin() {
                       whileHover={{ scale: 1.05 }}
                       whileTap={{ scale: 0.95 }}
                       onClick={clearSelection}
-                      className="px-3 py-2 bg-gray-500 text-white font-medium rounded-lg hover:bg-gray-600 transition-colors"
+                      className="px-3 py-2 bg-gray-600 text-white font-medium rounded-lg hover:bg-gray-700 transition-colors"
                     >
                       Temizle
                     </motion.button>
@@ -256,7 +323,7 @@ export default function ImageUploadAdmin() {
                       whileTap={{ scale: 0.95 }}
                       onClick={handleDeleteMultiple}
                       disabled={selectedImages.length === 0}
-                      className="px-3 py-2 bg-red-500 text-white font-medium rounded-lg hover:bg-red-600 transition-colors disabled:opacity-50"
+                      className="px-3 py-2 bg-red-600 text-white font-medium rounded-lg hover:bg-red-700 transition-colors disabled:opacity-50"
                     >
                       Sil ({selectedImages.length})
                     </motion.button>
@@ -264,7 +331,7 @@ export default function ImageUploadAdmin() {
                       whileHover={{ scale: 1.05 }}
                       whileTap={{ scale: 0.95 }}
                       onClick={toggleSelectionMode}
-                      className="px-3 py-2 bg-gray-700 text-white font-medium rounded-lg hover:bg-gray-800 transition-colors"
+                      className="px-3 py-2 bg-gray-800 text-white font-medium rounded-lg hover:bg-gray-900 transition-colors"
                     >
                       <FaTimes />
                     </motion.button>
@@ -331,7 +398,7 @@ export default function ImageUploadAdmin() {
                             e.stopPropagation();
                             if (image.id) handleDelete(image.id);
                           }}
-                          className="absolute top-2 right-2 p-2 bg-red-500 text-white rounded-full opacity-80 hover:opacity-100 transition-opacity shadow-lg z-10"
+                          className="absolute top-2 right-2 p-2 bg-red-600 text-white rounded-full opacity-80 hover:opacity-100 transition-opacity shadow-lg z-10"
                         >
                           <FaTrash className="text-xs" />
                         </motion.button>
@@ -349,13 +416,96 @@ export default function ImageUploadAdmin() {
                 animate={{ opacity: 1 }}
                 className="text-center py-16"
               >
-                <p className="text-gray-400 text-lg">
+                <p className="text-gray-600 text-lg">
                   Henüz görsel yüklenmedi. Sol taraftaki butona tıklayarak başlayın!
                 </p>
               </motion.div>
             )}
           </motion.div>
-        </div>
+            </motion.div>
+          ) : (
+            <motion.div
+              key="contacts"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+              className="bg-white rounded-2xl shadow-xl p-6 sm:p-8"
+            >
+              <div className="flex justify-between items-center mb-6">
+                <h2 className="text-2xl font-bold" style={{ color: '#376C6F' }}>İletişim Mesajları</h2>
+                <motion.button
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  onClick={loadContacts}
+                  disabled={contactsLoading}
+                  className="px-4 py-2 text-white font-medium rounded-lg transition-colors disabled:opacity-50"
+                  style={{ backgroundColor: '#376C6F' }}
+                >
+                  {contactsLoading ? 'Yükleniyor...' : 'Yenile'}
+                </motion.button>
+              </div>
+
+              {/* Contacts Table */}
+              {contactsLoading ? (
+                <div className="text-center py-16">
+                  <p className="text-gray-600 text-lg">Yükleniyor...</p>
+                </div>
+              ) : contacts.length > 0 ? (
+                <div className="overflow-x-auto">
+                  <table className="w-full">
+                    <thead>
+                      <tr className="border-b-2" style={{ borderColor: '#376C6F' }}>
+                        <th className="text-left py-4 px-2 font-semibold text-white" style={{ backgroundColor: '#376C6F' }}>İsim</th>
+                        <th className="text-left py-4 px-2 font-semibold text-white" style={{ backgroundColor: '#376C6F' }}>Telefon</th>
+                        <th className="text-left py-4 px-2 font-semibold text-white" style={{ backgroundColor: '#376C6F' }}>Konu</th>
+                        <th className="text-left py-4 px-2 font-semibold text-white" style={{ backgroundColor: '#376C6F' }}>Mesaj</th>
+                        <th className="text-left py-4 px-2 font-semibold text-white" style={{ backgroundColor: '#376C6F' }}>Tarih</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {contacts.map((contact, index) => (
+                        <motion.tr
+                          key={contact.id}
+                          initial={{ opacity: 0, y: 20 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          transition={{ delay: index * 0.05 }}
+                          className="border-b hover:bg-gray-100 transition-colors"
+                        >
+                          <td className="py-4 px-2 text-gray-800 font-medium">{contact.name}</td>
+                          <td className="py-4 px-2 text-gray-600">{contact.phone}</td>
+                          <td className="py-4 px-2 text-gray-600">{contact.subject}</td>
+                          <td className="py-4 px-2 text-gray-600 max-w-xs truncate" title={contact.message}>
+                            {contact.message}
+                          </td>
+                          <td className="py-4 px-2 text-gray-500 text-sm">
+                            {contact.createdAt.toDate().toLocaleDateString('tr-TR', {
+                              year: 'numeric',
+                              month: 'short',
+                              day: 'numeric',
+                              hour: '2-digit',
+                              minute: '2-digit'
+                            })}
+                          </td>
+                        </motion.tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              ) : (
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  className="text-center py-16"
+                >
+                  <FaUsers className="mx-auto text-6xl text-gray-400 mb-4" />
+                  <p className="text-gray-600 text-lg">
+                    Henüz iletişim mesajı bulunmuyor.
+                  </p>
+                </motion.div>
+              )}
+            </motion.div>
+          )}
+        </AnimatePresence>
 
       </div>
     </div>

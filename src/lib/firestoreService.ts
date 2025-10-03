@@ -69,3 +69,42 @@ export const deleteMultipleImagesFromFirestore = async (imageIds: string[]) => {
     return { success: false, error };
   }
 };
+
+// Contact form interface
+export interface ContactData {
+  id?: string;
+  name: string;
+  phone: string;
+  subject: string;
+  message: string;
+  createdAt: Timestamp;
+}
+
+// Save contact form to Firestore
+export const saveContactToFirestore = async (contactData: Omit<ContactData, 'id' | 'createdAt'>) => {
+  try {
+    const docRef = await addDoc(collection(db, 'contact'), {
+      ...contactData,
+      createdAt: Timestamp.now(),
+    });
+    return { success: true, id: docRef.id };
+  } catch (error) {
+    console.error('Error saving contact to Firestore:', error);
+    return { success: false, error };
+  }
+};
+
+// Get all contact submissions from Firestore
+export const getContactsFromFirestore = async (): Promise<ContactData[]> => {
+  try {
+    const q = query(collection(db, 'contact'), orderBy('createdAt', 'desc'));
+    const querySnapshot = await getDocs(q);
+    return querySnapshot.docs.map(doc => ({
+      id: doc.id,
+      ...doc.data(),
+    })) as ContactData[];
+  } catch (error) {
+    console.error('Error getting contacts from Firestore:', error);
+    return [];
+  }
+};

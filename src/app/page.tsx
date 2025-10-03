@@ -6,21 +6,21 @@ import Contact from './Contact';
 
 export default function Main() {
   return (
-    <>
-    {/* Hero Bölümü */}
     <div>
+    {/* Hero Bölümü */}
+    <div className='overflow-hidden'>
     <HomeHero />
     </div>
 
     {/* Katalog Bölümü */}
-    <div>
+    <div className='overflow-hidden'>
       <Catalog />
     </div>
 
     {/* İletişim Bölümü */}
-    <div>
+    <div className='overflow-hidden'>
       <Contact />
     </div>
-    </>
+    </div>
   );
 }
