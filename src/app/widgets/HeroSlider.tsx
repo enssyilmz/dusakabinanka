@@ -45,14 +45,14 @@ export default function HeroSlider() {
   }, [go]);
 
   return (
-    <div className="fixed top-0 right-0 bottom-0 left-[300px] sm:left-[260px] md:left-[300px] lg:left-[360px] z-10">
+    <div className="absolute top-0 right-0 bottom-0 left-0 sm:left-[220px] md:left-[280px] lg:left-[360px] z-10">
       {slides.map((s, i) => (
         <div key={s.src} className={`absolute inset-0 transition-opacity duration-700 ${i === index ? 'opacity-100' : 'opacity-0'}`}>
           <Image src={s.src} alt={s.alt} fill priority className="object-cover" sizes="100vw" />
         </div>
       ))}
 
-      <div className="fixed bottom-6 left-1/2 -translate-x-1/2 hidden lg:flex gap-3 z-50 px-2">
+      <div className="fixed bottom-6 left-1/2 -translate-x-1/2 hidden lg:flex gap-3 z-50 px-2 pointer-events-auto">
         {slides
           .map((s, i) => ({ ...s, i }))
           .filter(({ i }) => i !== index)
