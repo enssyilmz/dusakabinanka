@@ -42,7 +42,7 @@ export default function Catalog() {
           initial="hidden"
           whileInView="visible"
           viewport={{ amount: 0.1 }}
-          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6"
+          className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6"
         >
           {Array.from({ length: 9 }).map((_, i) => (
             <motion.div
