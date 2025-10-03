@@ -45,7 +45,7 @@ export default function HeroSlider() {
   }, [go]);
 
   return (
-    <div className="absolute top-0 right-0 bottom-0 left-0 sm:left-[220px] md:left-[280px] lg:left-[360px] z-10">
+    <div className="absolute top-0 right-0 bottom-0 left-0 z-10">
       {slides.map((s, i) => (
         <div key={s.src} className={`absolute inset-0 transition-opacity duration-700 ${i === index ? 'opacity-100' : 'opacity-0'}`}>
           <Image src={s.src} alt={s.alt} fill priority className="object-cover" sizes="100vw" />
