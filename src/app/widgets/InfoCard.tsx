@@ -36,7 +36,7 @@ export default function InfoCard({ infoIndex, setInfoIndex }: InfoCardProps) {
   const item = infoItems[infoIndex];
 
   return (
-    <div className="absolute right-4 bottom-4 md:right-6 md:bottom-6 z-50 max-w-[300px] md:max-w-[320px] lg:max-w-[380px] text-white">
+    <div className="fixed right-4 bottom-4 md:right-6 md:bottom-6 z-40 max-w-[280px] sm:max-w-[300px] md:max-w-[320px] lg:max-w-[380px] text-white">
       <div className="relative bg-black/60 backdrop-blur-md p-2.5 sm:p-3 md:p-4 shadow-xl">
         <div className="absolute -top-7 sm:-top-8 md:-top-9 right-0 flex">
           <button
