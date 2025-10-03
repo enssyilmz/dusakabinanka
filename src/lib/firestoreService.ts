@@ -16,7 +16,7 @@ export interface ImageData {
   };
 }
 
-const COLLECTION_NAME = 'images';
+const COLLECTION_NAME = 'catalogs';
 
 // Save Cloudinary image data to Firestore
 export const saveImageToFirestore = async (imageData: Omit<ImageData, 'id' | 'uploadedAt'>) => {
@@ -54,6 +54,18 @@ export const deleteImageFromFirestore = async (imageId: string) => {
     return { success: true };
   } catch (error) {
     console.error('Error deleting image from Firestore:', error);
+    return { success: false, error };
+  }
+};
+
+// Delete multiple images from Firestore
+export const deleteMultipleImagesFromFirestore = async (imageIds: string[]) => {
+  try {
+    const deletePromises = imageIds.map(id => deleteDoc(doc(db, COLLECTION_NAME, id)));
+    await Promise.all(deletePromises);
+    return { success: true };
+  } catch (error) {
+    console.error('Error deleting multiple images from Firestore:', error);
     return { success: false, error };
   }
 };
