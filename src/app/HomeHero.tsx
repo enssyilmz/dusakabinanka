@@ -158,7 +158,7 @@ export default function HomeHero() {
         whileInView={{ y: 0, opacity: 1 }}
         viewport={{ amount: 0.3 }}
         transition={{ delay: 0.8, duration: 0.6 }}
-        className="fixed bottom-6 left-6 z-50 hidden lg:flex items-center gap-3"
+        className="fixed bottom-6 left-6 z-40 hidden lg:flex items-center gap-3"
       >
         <motion.button 
           whileHover={{ scale: 1.1, backgroundColor: "rgba(0,0,0,0.7)" }}
