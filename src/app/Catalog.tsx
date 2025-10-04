@@ -22,8 +22,8 @@ export default function Catalog() {
         setItemsPerPage(8);
       } else if (width >= 768) { // Tablet (md) - 3x2 = 6
         setItemsPerPage(6);
-      } else { // Mobile (sm and below) - 2x2 = 4
-        setItemsPerPage(4);
+      } else { // Mobile (sm and below) - 2x3 = 6
+        setItemsPerPage(6);
       }
     };
 
@@ -170,8 +170,9 @@ export default function Catalog() {
               key={`page-${currentPage}`}
               variants={containerVariants}
               initial="hidden"
-              animate="visible"
-              className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-4 gap-6 sm:gap-8"
+              whileInView="visible"
+              viewport={{ amount: 0.2 }}
+              className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-4 gap-4 sm:gap-6 md:gap-8"
             >
               {currentImages.map((image, index) => (
                 <motion.div
@@ -196,49 +197,52 @@ export default function Catalog() {
 
             {/* Pagination Controls */}
             {totalPages > 1 && (
-              <div className="flex justify-center items-center mt-8 gap-4">
-                {/* Previous Button */}
-                <motion.button
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                  onClick={goToPreviousPage}
-                  disabled={currentPage === 0}
-                  className="flex items-center gap-2 px-4 py-2 bg-white/20 text-white rounded-lg hover:bg-white/30 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  <FaChevronLeft />
-                  <span>Önceki</span>
-                </motion.button>
+              <div className="mt-8">
+                {/* Previous/Next Buttons - Always visible */}
+                <div className="flex justify-between items-center mb-4">
+                  <motion.button
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                    onClick={goToPreviousPage}
+                    disabled={currentPage === 0}
+                    className="flex items-center gap-2 px-3 sm:px-4 py-2 bg-white/20 text-white rounded-lg hover:bg-white/30 transition-colors disabled:opacity-50 disabled:cursor-not-allowed text-sm sm:text-base"
+                  >
+                    <FaChevronLeft />
+                    <span className="hidden sm:inline">Önceki</span>
+                  </motion.button>
 
-                {/* Page Numbers */}
-                <div className="flex gap-2">
-                  {Array.from({ length: totalPages }, (_, i) => (
-                    <motion.button
-                      key={i}
-                      whileHover={{ scale: 1.1 }}
-                      whileTap={{ scale: 0.9 }}
-                      onClick={() => goToPage(i)}
-                      className={`px-3 py-2 rounded-lg transition-colors ${
-                        currentPage === i
-                          ? 'bg-white text-[#376C6F] font-semibold'
-                          : 'bg-white/20 text-white hover:bg-white/30'
-                      }`}
-                    >
-                      {i + 1}
-                    </motion.button>
-                  ))}
+                  <motion.button
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                    onClick={goToNextPage}
+                    disabled={currentPage === totalPages - 1}
+                    className="flex items-center gap-2 px-3 sm:px-4 py-2 bg-white/20 text-white rounded-lg hover:bg-white/30 transition-colors disabled:opacity-50 disabled:cursor-not-allowed text-sm sm:text-base"
+                  >
+                    <span className="hidden sm:inline">Sonraki</span>
+                    <FaChevronRight />
+                  </motion.button>
                 </div>
 
-                {/* Next Button */}
-                <motion.button
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                  onClick={goToNextPage}
-                  disabled={currentPage === totalPages - 1}
-                  className="flex items-center gap-2 px-4 py-2 bg-white/20 text-white rounded-lg hover:bg-white/30 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  <span>Sonraki</span>
-                  <FaChevronRight />
-                </motion.button>
+                {/* Page Numbers - Scrollable on mobile for many pages */}
+                <div className="flex justify-center">
+                  <div className="flex gap-1 sm:gap-2 overflow-x-auto scrollbar-hide max-w-full px-4 pb-2">
+                    {Array.from({ length: totalPages }, (_, i) => (
+                      <motion.button
+                        key={i}
+                        whileHover={{ scale: 1.1 }}
+                        whileTap={{ scale: 0.9 }}
+                        onClick={() => goToPage(i)}
+                        className={`px-2 sm:px-3 py-2 rounded-lg transition-colors text-sm sm:text-base whitespace-nowrap ${
+                          currentPage === i
+                            ? 'bg-white text-[#376C6F] font-semibold'
+                            : 'bg-white/20 text-white hover:bg-white/30'
+                        }`}
+                      >
+                        {i + 1}
+                      </motion.button>
+                    ))}
+                  </div>
+                </div>
               </div>
             )}
 

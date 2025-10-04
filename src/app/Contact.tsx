@@ -1,13 +1,16 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { saveContactToFirestore } from '@/lib/firestoreService';
 import MapComponent from './components/MapComponent';
 import { FaMapMarkerAlt, FaPhone, FaClock } from 'react-icons/fa';
+import { usePopup } from './widgets/PopupWidget';
 
 export default function Contact() {
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const { showPopup } = usePopup();
+  const formRef = useRef<HTMLFormElement>(null);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -24,14 +27,29 @@ export default function Contact() {
     try {
       const response = await saveContactToFirestore(contactData);
       if (response.success) {
-        alert('Mesajınız başarıyla gönderildi! En kısa sürede size dönüş yapacağız.');
-        e.currentTarget.reset();
+        showPopup({
+          type: 'success',
+          title: 'Mesaj Gönderildi',
+          message: 'Mesajınız başarıyla gönderildi! En kısa sürede size dönüş yapacağız.',
+          duration: 4000
+        });
+        formRef.current?.reset();
       } else {
-        alert('Mesaj gönderilirken bir hata oluştu. Lütfen tekrar deneyin.');
+        showPopup({
+          type: 'error',
+          title: 'Hata',
+          message: 'Mesaj gönderilirken bir hata oluştu. Lütfen tekrar deneyin.',
+          duration: 5000
+        });
       }
     } catch (error) {
       console.error('Contact form error:', error);
-      alert('Mesaj gönderilirken bir hata oluştu. Lütfen tekrar deneyin.');
+      showPopup({
+        type: 'error',
+        title: 'Hata',
+        message: 'Mesaj gönderilirken bir hata oluştu. Lütfen tekrar deneyin.',
+        duration: 5000
+      });
     } finally {
       setIsSubmitting(false);
     }
@@ -133,6 +151,7 @@ export default function Contact() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ amount: 0.3 }}
             transition={{ delay: 0.3, duration: 0.6 }}
+            ref={formRef}
             onSubmit={handleSubmit}
             className="bg-white rounded-lg sm:rounded-xl p-4 sm:p-6 md:p-8 shadow-xl space-y-3 sm:space-y-4 md:space-y-6"
           >

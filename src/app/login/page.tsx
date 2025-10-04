@@ -21,7 +21,7 @@ export default function LoginPage() {
     try {
       await signInWithEmailAndPassword(auth, email, password);
       router.push('/admin');
-    } catch (err: any) {
+    } catch (err) {
       setError('Email veya şifre hatalı');
       console.error(err);
     } finally {

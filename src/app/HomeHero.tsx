@@ -45,7 +45,7 @@ export default function HomeHero() {
             className="w-1 bg-white h-[160px] mt-2" 
           />
           <motion.div whileHover={{ scale: 1.2, rotate: 5 }} whileTap={{ scale: 0.9 }}>
-            <Link href="#" aria-label="Instagram" className="grid place-items-center size-10 text-white">
+            <Link href="https://www.instagram.com/dusakabinanka" aria-label="Instagram" className="grid place-items-center size-10 text-white">
               <FaInstagram className="size-10" />
             </Link>
           </motion.div>
@@ -72,8 +72,7 @@ export default function HomeHero() {
       {/* Mobile logo */}
       <motion.div
         initial={{ y: -50, opacity: 0 }}
-        whileInView={{ y: 0, opacity: 1 }}
-        viewport={{ amount: 0.3 }}
+        animate={{ y: 0, opacity: 1 }}
         transition={{ duration: 0.6, ease: "easeOut" }}
       >
         <Link href="/" aria-label="Ana sayfa" className="sm:hidden fixed top-4 left-4 z-40 inline-flex items-center">
@@ -83,14 +82,14 @@ export default function HomeHero() {
 
       {/* Mobile social icons */}
       <motion.nav 
-        initial={{ y: -50, opacity: 0 }}
-        whileInView={{ y: 0, opacity: 1 }}
+        initial={{ opacity: 0 }}
+        whileInView={{ opacity: 1 }}
         viewport={{ amount: 0.3 }}
-        transition={{ delay: 0.2, duration: 0.6, ease: "easeOut" }}
+        transition={{ delay: 0.6, duration: 0.8 }}
         className="sm:hidden fixed top-4 right-4 z-40 flex gap-3 items-center"
       >
         <motion.div whileHover={{ scale: 1.2, rotate: 5 }} whileTap={{ scale: 0.9 }}>
-          <Link href="#" aria-label="Instagram" className="grid place-items-center size-8 text-white">
+          <Link href="https://www.instagram.com/dusakabinanka" aria-label="Instagram" className="grid place-items-center size-8 text-white ">
             <FaInstagram className="size-8" />
           </Link>
         </motion.div>
